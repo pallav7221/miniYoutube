@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini YouTube</title>
+    <style>
+        *{
+            width: 100%;
+            margin: 0px;
+            padding: 0px;
+            box-sizing: border-box;
+        }
+        #navbar{
+            width: 100%;
+            /* background-color: aqua; */
+            height: 70px;
+            display: flex;
+            align-items: center;
+            
+        }
+        #logo{
+            width: 20%;
+        }
+        #search{
+            /* width: 30%; */
+            display: flex;
+            margin: 10px;
+        }
+         #search>button>img{
+             width: 20px;
+             height: 40px;
+         }
+         #search>button{
+             width: 30px;
+
+         }
+        #logo>img{
+            width: 100px;
+            height: 100px;
+        }
+        img{
+            height: 50px;
+        }
+        #features{
+            width: 30%;
+            display: flex;
+            margin: 0px 50px;
+        }
+        #features>img{
+            width: 50px;
+            height: 40px;
+            margin: 0px 10px;
+        }
+        #searchedResult{
+            display: grid;
+            grid-template-columns: repeat(4,1fr);
+            gap: 30px;
+            font-size: 20px;
+        }
+         #searchedResult>div>img{
+             height: 250px;
+         }
+          #searchedResult>div{
+              padding: 10px;
+          }
+    </style>
+</head>
+<body>
+    <nav id="navbar">
+        <div id="logo">
+            <img src="./YouTube-Logo.wine.png" alt="">
+        </div>
+       <div id="search">
+           <input type="text" placeholder="Search">
+           <button onclick="searchFun()"><img src="./101-1017087_search-icon-our-vision-png-icon-transparent-png.png" alt=""> </button>
+       </div>
+       <div id="features">
+           <img src="./mic.png" alt="">
+           <img src="./video.png" alt="">
+           <img src="./apps.png" alt="">
+           <img src="./notification.jpg" alt="">
+           <img src="./profile.png" alt="">
+       </div>
+    </nav>
+    <div id="searchedResult">
+
+    </div>
+</body>
+<script>
+    var url = `https://www.googleapis.com/youtube/v3/search?q=tesla&type=video&key=AIzaSyAnXH98KdZ5X8zJkMbsrIkKHLI3joRoSlA
+     &part=snippet`
+     
+    var resultDiv = document.querySelector("#searchedResult");
+    function searchFun(){
+        var resultDiv = document.querySelector("#searchedResult").innerHTML = "";
+        var videoQuery = document.querySelector("#search>input").value;
+
+         fetch(`https://www.googleapis.com/youtube/v3/search?q=${videoQuery}&type=video&key=AIzaSyAnXH98KdZ5X8zJkMbsrIkKHLI3joRoSlA
+     &part=snippet&maxResults=20`).then(respose => {
+            return respose.json()
+        }).then(data => {
+            appendData(data.items);
+            // console.log(data.items);
+
+        })
+    }
+      
+function appendData(data){
+    data.forEach(({snippet,id:{videoId}}) => {
+        // console.log(snippet);
+
+        var box = document.createElement("div");
+        var title = document.createElement("p");
+
+        title.innerHTML = snippet.title;
+
+        var thumbnail = document.createElement("img");
+        thumbnail.src = snippet.thumbnails.medium.url;
+
+        var dataForPlayVideo = {
+            snippet:snippet,
+            videoId : videoId,
+        }
+        box.onclick=()=>{
+            localStorage.setItem("click",JSON.stringify(dataForPlayVideo));
+            window.location.href = "video.html";
+        }
+
+        box.append(thumbnail, title);
+        resultDiv.append(box)
+    });
+}
+
+function popular(){
+     var resultDiv = document.querySelector("#searchedResult").innerHTML = "";
+
+          fetch(`https://www.googleapis.com/youtube/v3/videos?chart=mostPopular&regionCode=IN&type=video&key=AIzaSyAnXH98KdZ5X8zJkMbsrIkKHLI3joRoSlA
+     &part=snippet&maxResults=20`).then(respose => {
+        return respose.json()
+    }).then(data => {
+        appendData(data.items);
+        // console.log(data.items);
+
+    })
+
+}
+popular();
+</script>
+</html>
